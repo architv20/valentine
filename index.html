@@ -121,8 +121,9 @@
             display: flex;
             gap: 20px;
             justify-content: center;
+            align-items: center; /* Ensure vertical alignment */
             width: 100%;
-            height: 80px; /* Pre-allocate space */
+            height: 80px; 
         }
 
         button {
@@ -143,10 +144,13 @@
         }
         .yes-btn:hover { transform: scale(1.1); }
 
+        /* --- FIXED: NO BUTTON --- */
         .no-btn {
             background: #ffffff;
             color: #333;
-            position: absolute; /* Allows movement */
+            /* Changed from absolute to relative so it respects Flexbox gap */
+            position: relative; 
+            transition: 0.2s;
         }
 
         /* --- SUCCESS & SLIDESHOW --- */
@@ -248,7 +252,7 @@
             </div>
 
             <p id="typewriter" class="final-message"></p>
-            <p class="secret-msg">(PS: I've been waiting to ask this for so long...)</p>
+            <p class="secret-msg">(PS: I already knew you would say yes....)</p>
         </div>
     </div>
 
@@ -256,13 +260,12 @@
 
     <script>
         /* --- CONFIGURATION --- */
-        // Add your image URLs here for the slideshow
         const slides = document.querySelectorAll('.slide');
         
-        // The Story Text Sequence
         const storyLines = [
             "Every story has a beginning...",
-            "Ours started with a smile...",
+            "Ours started with confusion...",
+            "Then with a smile...",
             "And now, I have one important question..."
         ];
 
@@ -290,12 +293,12 @@
         const storyTextElem = document.getElementById('storyText');
 
         document.getElementById('startBtn').addEventListener('click', () => {
-            startScreen.classList.add('hidden'); // Hide button
+            startScreen.classList.add('hidden'); 
             startScreen.style.display = 'none';
-            introScreen.classList.remove('hidden'); // Show intro container
+            introScreen.classList.remove('hidden'); 
             introScreen.style.display = 'flex';
             music.volume = 0.5;
-            music.play().catch(e => console.log("Audio play failed", e));
+            music.play().catch(e => console.log("Audio play failed (browser policy?)", e));
             playStory();
         });
 
@@ -303,11 +306,10 @@
             for (const line of storyLines) {
                 storyTextElem.innerText = line;
                 storyTextElem.classList.add('visible');
-                await new Promise(r => setTimeout(r, 2500)); // Read time
+                await new Promise(r => setTimeout(r, 2500)); 
                 storyTextElem.classList.remove('visible');
-                await new Promise(r => setTimeout(r, 500)); // Fade out time
+                await new Promise(r => setTimeout(r, 500)); 
             }
-            // Transition to Question
             introScreen.classList.add('hidden');
             introScreen.style.display = 'none';
             questionScreen.classList.remove('hidden');
@@ -316,23 +318,18 @@
 
         // 3. SMART NO BUTTON
         const noBtn = document.getElementById('noBtn');
-        const btnContainer = document.querySelector('.btn-container');
 
-        // Initial setup for No button to sit next to Yes
-        // We leave it static until first interaction
-        
         function moveButton() {
             const width = window.innerWidth;
             const height = window.innerHeight;
             const btnW = noBtn.offsetWidth;
             const btnH = noBtn.offsetHeight;
 
-            // Make it absolute if it isn't yet
+            // CHANGE: We switch to fixed positioning ONLY when moving starts
             if(noBtn.style.position !== 'fixed') {
                 noBtn.style.position = 'fixed';
             }
 
-            // Calculate new position (random but safe from edges)
             const newX = Math.random() * (width - btnW - 40) + 20;
             const newY = Math.random() * (height - btnH - 40) + 20;
 
@@ -356,11 +353,12 @@
         // 5. SLIDESHOW LOGIC
         let slideIndex = 0;
         function startSlideshow() {
+            if(slides.length === 0) return; // safety check
             setInterval(() => {
                 slides[slideIndex].classList.remove('active');
                 slideIndex = (slideIndex + 1) % slides.length;
                 slides[slideIndex].classList.add('active');
-            }, 3000); // Change image every 3 seconds
+            }, 3000); 
         }
 
         // 6. TYPEWRITER EFFECT
@@ -376,7 +374,7 @@
             }
         }
 
-        // 7. HEART RAIN (CONFETTI)
+        // 7. HEART RAIN 
         function startConfetti() {
             setInterval(createHeart, 200);
         }
